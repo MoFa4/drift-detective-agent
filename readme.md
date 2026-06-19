@@ -41,32 +41,44 @@
 
 ## 🏗️ Architecture
 
+┌─────────────────────────────────────────────────────────────┐
+│ DRIFT DETECTIVE FLOW │
+└─────────────────────────────────────────────────────────────┘
 ┌──────────────┐
- │ EC2 Auditor  │ Every 5 minutes
- │  (Cron Job)  │ scans all running
- └──────┬───────┘ instances in VPC
-        │
-        ▼
- ┌──────────────┐    Has 'Environment=Terraform-Managed' tag?
- │ Check Tags   │    ──────────────────────────────────────
- └──────┬───────┘              │
-        │                      │
- ┌──────┴───────┐         ┌───┴───┐
- │   NO TAG     │         │  YES  │
- │  (ROGUE!)    │         │  OK   │
- └──────┬───────┘         └───────┘
-        │
-        ▼
- ┌──────────────┐
- │ Lambda       │ 1. Stop instance
- │ Enforcer     │ 2. Tag as violation
- └──────┬───────┘ 3. Send SNS alert
-        │
-        ▼
- ┌──────────────┐
- │ Security     │ 📧 Email received
- │ Team Alert   │ within 30 seconds
- └──────────────┘
+│ EC2 Auditor │
+│ (Cron Job) │───── Every 5 minutes
+└──────┬───────┘
+│
+▼
+┌──────────────┐
+│ Scan All │
+│ EC2 Instances│
+└──────┬───────┘
+│
+▼
+┌──────────────┐ YES ┌──────────┐
+│ Has Required │────────────▶│ IGNORE │
+│ Tag? │ └──────────┘
+└──────┬───────┘
+│ NO
+▼
+┌──────────────┐
+│ Invoke │
+│ Lambda │
+└──────┬───────┘
+│
+▼
+┌──────────────┐
+│ 1. Stop EC2 │
+│ 2. Tag It │
+│ 3. Send SNS │
+└──────┬───────┘
+│
+▼
+┌──────────────┐
+│ 📧 Email │
+│ Security Team│
+└──────────────┘
 
  
 ### 🛠️ Tech Stack
