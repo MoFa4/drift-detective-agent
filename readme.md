@@ -41,44 +41,31 @@
 
 ## 🏗️ Architecture
 
-┌─────────────────────────────────────────────────────────────┐
-│ DRIFT DETECTIVE FLOW │
-└─────────────────────────────────────────────────────────────┘
-┌──────────────┐
-│ EC2 Auditor │
-│ (Cron Job) │───── Every 5 minutes
-└──────┬───────┘
-│
-▼
-┌──────────────┐
-│ Scan All │
-│ EC2 Instances│
-└──────┬───────┘
-│
-▼
-┌──────────────┐ YES ┌──────────┐
-│ Has Required │────────────▶│ IGNORE │
-│ Tag? │ └──────────┘
-└──────┬───────┘
-│ NO
-▼
-┌──────────────┐
-│ Invoke │
-│ Lambda │
-└──────┬───────┘
-│
-▼
-┌──────────────┐
-│ 1. Stop EC2 │
-│ 2. Tag It │
-│ 3. Send SNS │
-└──────┬───────┘
-│
-▼
-┌──────────────┐
-│ 📧 Email │
-│ Security Team│
-└──────────────┘
+```mermaid
+flowchart TD
+    A[🖥️ EC2 Auditor<br/>Cron: Every 5 min] -->|Scans VPC| B{Has<br/>Environment=<br/>Terraform-Managed<br/>Tag?}
+    B -->|YES ✅| C[✓ Ignore<br/>Managed Instance]
+    B -->|NO 🚨| D[⚡ Invoke Lambda]
+    D --> E[🛑 Stop Instance]
+    E --> F[🏷️ Tag as<br/>Quarantined-Violation]
+    F --> G[📧 SNS Email<br/>to Security Team]
+    
+    style A fill:#FF9900,stroke:#333,color:#fff
+    style D fill:#FF6B6B,stroke:#333,color:#fff
+    style G fill:#4ECDC4,stroke:#333,color:#fff
+    style C fill:#95E1D3,stroke:#333,color:#000
+```
+
+### 🛠️ Tech Stack
+
+| Component | AWS Service | Purpose |
+|-----------|-------------|---------|
+| **Auditor** | EC2 + Cron | Scans VPC every 5 min |
+| **Enforcer** | Lambda | Stops & tags rogue instances |
+| **Alerts** | SNS | Email notifications |
+| **Storage** | RDS PostgreSQL | Audit logs |
+| **Network** | VPC | Isolated environment |
+| **Security** | IAM | Least privilege access |
 
  
 ### 🛠️ Tech Stack
