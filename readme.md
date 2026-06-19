@@ -67,19 +67,6 @@ flowchart TD
 | **Network** | VPC | Isolated environment |
 | **Security** | IAM | Least privilege access |
 
- 
-### 🛠️ Tech Stack
-
-- **Infrastructure:** Terraform (Infrastructure as Code)
-- **Compute:** EC2 (Auditor), Lambda (Enforcer)
-- **Database:** RDS PostgreSQL (Audit logs)
-- **Networking:** VPC, Subnets, Security Groups
-- **Messaging:** SNS (Email notifications)
-- **Monitoring:** CloudWatch Logs
-- **Security:** IAM Roles (Least privilege)
-
----
-
 ## 📊 Results
 
 <div align="center">
